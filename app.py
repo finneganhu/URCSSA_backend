@@ -1,7 +1,7 @@
 import os
 import boto3
 
-from flask import Flask
+from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 PROFESSORS_TABLE = os.environ['PROFESSORS_TABLE']
@@ -11,39 +11,53 @@ client = boto3.client('dynamodb')
 def hello():
     return "Hello World!"
 
-@app.route("/users/<string:user_id>")
-def get_user(user_id):
-    res = client.get_item(
-        TableName = PROFESSORS_TABLE,
-        Key = {
-            'userId': {'S': user_id}
-        }
-    )
-    item = res.get('Item')
-    if not item:
-        return jsonify({'error': 'User does not exist'}), 404
+# Query all professors in a given department
+# @app.route("/profs/<string:department_name>")
+# def get_profs(department_name):
+#     res = client.query(
+#         TableName = PROFESSORS_TABLE,
+#         KeyConditionExpression = Key('Department').eq({'S': department_name})
+#     )
+#     items = res.get('Items')
+#     if not items:
+#         return jsonify({
+#             'error': 'No information of professors in this department'
+#         }), 404
+#     return items
 
-    return jsonify({
-        'userId': item.get('userId').get('S'),
-        'name': item.get('name').get('S')
-    })
+# # Create a new professor with given name, department, and info
+# @app.route("/profs", methods = ["POST"])
+# def create_prof():
+#     department = request.json.get('Department')
+#     name = request.json.get('Name')
+#     if not department or not name:
+#         return jsonify({'error': 'Please provide department and name'}), 400
+#     res = client.put_item(
+#         TableName = PROFESSORS_TABLE,
+#         Item = {
+#             'Department': {'S': department},
+#             'Name': {'S': name}
+#         }
+#     )
+#     return jsonify({
+#         'Department': department,
+#         'Name': name
+#     })
 
-@app.route("/users", methods = ["POST"])
-def create_user():
-    user_id = request.json.get('userId')
-    name = request.json.get('name')
-    if not user_id or not name:
-        return jsonify({'error': 'Please provide userId and name'}), 400
-
-    res = client.put_item(
-        TableName = USER_TABLE,
-        Item = {
-            'userId': {'S': user_id},
-            'name': {'S': name}
-        }
-    )
-
-    return jsonify({
-        'userId': user_id,
-        'name': name
-    })
+# # Get a professor by its name
+# @app.route("/profs/<string:prof_name>")
+# def get_user(user_id):
+#     res = client.get_item(
+#         TableName = PROFESSORS_TABLE,
+#         Key = {
+#             'Name': {'S': prof_name}
+#         }
+#     )
+#     item = res.get('Item')
+#     if not item:
+#         return jsonify({'error': 'User does not exist'}), 404
+#
+#     return jsonify({
+#         'userId': item.get('userId').get('S'),
+#         'name': item.get('name').get('S')
+#     })
