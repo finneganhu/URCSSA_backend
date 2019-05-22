@@ -1,4 +1,7 @@
 .serverless
 *.pyc
 *.pyo
-node_modules/
+/node_modules/
+accessKeys.csv
+package.json
+package-lock.json
