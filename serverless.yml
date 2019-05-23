@@ -30,7 +30,7 @@ provider:
               - dynamodb:DeleteItem
           Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PROFESSORS_TABLE}"
 functions:
-    create:
+    create: # create a new professor item with given Department and Name
         handler: api/create.create
         events:
             - http:
@@ -38,12 +38,36 @@ functions:
                 method: post
                 cors: true
 
-    list:
+    getProf: # get a specific professor item with given Department and Name
+        handler: api/getProf.getProf
+        events:
+            - http:
+                path: api/{department}/{name}
+                method: get
+                cors: true
+
+    getProfs: # query all professor items in the given Department
+        handler: api/getProfs.getProfs
+        events:
+            - http:
+                path: api/{department}
+                method: get
+                cors: true
+
+    list: # scan through the database and list all professor items
         handler: api/list.list
         events:
             - http:
                 path: api
                 method: get
+                cors: true
+
+    update: # update comments to a specific professor item given Department and Name
+        handler: api/update.update
+        events:
+            - http:
+                path: api/{department}/{name}
+                method: patch
                 cors: true
 
 resources:
