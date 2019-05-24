@@ -8,21 +8,22 @@ import boto3
 dynamodb = boto3.resource('dynamodb')
 
 def create(event, context):
+    table = dynamodb.Table(os.environ['PROFESSORS_TABLE'])
+
     data = json.loads(event['body'])
     if 'Department' not in data or 'Name' not in data:
         logging.error("Validation Failed")
         raise Exception("Information missing.")
 
-    table = dynamodb.Table(os.environ['PROFESSORS_TABLE'])
-
     item = {
         'id': str(uuid.uuid1()),
         'Department': data['Department'],
-        'Name': data['Name']
+        'Name': data['Name'],
+        'Evaluations': []
     }
 
-    if 'info' in data:
-        item['info'] = data['info']
+    if 'Info' in data:
+        item['Info'] = data['Info']
 
     table.put_item(Item = item)
 
